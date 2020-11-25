@@ -42,7 +42,7 @@ class xml_converter:
             for file in files:
                 if file.endswith('.xml'):
                     xmldoc = minidom.parse(file)
-                    yolo_format = (RESULT_FORMAT_PATH+'/'+file[:-4]+'.txt')
+                    yolo_format = (ORIGIN_FORMAT_PATH+'/'+file[:-4]+'.txt')
 
                     with open(yolo_format, "w") as f:
             
