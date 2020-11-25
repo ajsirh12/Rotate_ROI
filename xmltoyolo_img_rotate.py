@@ -9,7 +9,7 @@ print("Current path is {}".format(current_path))
 ORIGIN_FORMAT_PATH = current_path + '/images/org_image'
 RESULT_FORMAT_PATH = current_path + '/images/res_image'
 XML_FORMAT_PATH = current_path + '/images/annotation'
-ANGLE = 90
+
 
 file_count = 0
 classes={}
@@ -35,23 +35,70 @@ def rotate_chg(img, angle):
         dst = ndimage.rotate(img, angle)
         return dst
 
+def rotate_test(x, y, w, h, nw, nh):
+    cos, sin = np.cos(np.pi * (ANGLE/180)), np.sin(np.pi * (ANGLE/180))
+
+    print(x, y, w, h, nw, nh)
+
+    ww, hh = int((w - nw)/2), int((h - nh)/2)
+    print(ww, hh)
+
+    cx, cy = int(x * w), int(y * h)
+    print(cx, cy)
+
+    # cx, cy = cx - (w/2), (h/2) - cy
+    # print(cx, cy)
+
+    xx = (cx * cos) - (cy * sin)
+    yy = (cx * sin) + (cy * cos)
+    print(int(xx), int(yy))
+    
+    cx, cy = int(xx + (ww/2)), int((hh/2) + yy)
+
+    print(cx, cy) 
+
+
+ANGLE = 180
+
 def rotate_matrix(x, y, w, h, nw, nh):
     cos, sin = np.cos(np.pi * (ANGLE/180)), np.sin(np.pi * (ANGLE/180))
 
+    # print(x, y, w, h, nw, nh)
+
     ww = (nw - w) / 2
     hh = (nh - h) / 2
-    print(hh, ww)
+    # print('2.', hh, ww)
+    # print('a.', y*h, x*w)
 
-    nx = ((x * w) + ww) / nw
-    ny = ((y * h) + hh) / nh
-    print(ny, nx)
+    nx = ((x * w) + ww)
+    ny = ((y * h) + hh)
+    # print('3.', 0.5 - ny, nx - 0.5)
     
     xx = ((nx - 0.5) * cos) - ((0.5 - ny) * sin)
-    yy = ((nx - 0.5) * sin) + ((0.5 - ny) * cos)
+    yy = (((nx - 0.5) * sin) + ((0.5 - ny) * cos))
+    # print('5.', yy, xx)
 
     # xx = ((x - 0.5) * cos) - ((0.5 - y) * sin)
     # yy = ((x - 0.5) * sin) + ((0.5 - y) * cos)
+    # print('5.', yy, xx)
+
+    # xx = ((xx * w) + ww) / nw
+    # yy = ((yy * h) + hh) / nh
+    # print('5.', yy, xx)
+
     return xx + 0.5, 0.5 - yy
+
+    # nx = ((x * w) + ww)
+    # ny = ((y * h) + hh)
+    # # print('3.', ny-0.5, 0.5-nx)
+    
+    # xx = ((nx - (w/2)) * cos) - (((h/2) - ny) * sin)
+    # yy = (((nx - (w/2)) * sin) + (((h/2) - ny) * cos))
+    # print('5.', yy, xx)
+
+    # # xx = ((x - 0.5) * cos) - ((0.5 - y) * sin)
+    # # yy = ((x - 0.5) * sin) + ((0.5 - y) * cos)
+    # return xx + (nw/2), (nh/2) - yy
 
 def find_minmax(x1, x2, y1, y2, w, h):
     chk_x = list()
@@ -81,7 +128,7 @@ for current_dir, dirs, files in os.walk('.'):
             org_img_path = ORIGIN_FORMAT_PATH + '/' + file.split('.')[0] + '.jpg'
             
             org_img = cv2.imread(org_img_path)
-            rot_img = rotate_chg(org_img, ANGLE)
+            
             with open(yolo_format, "w") as f:
     
                 objects = xmldoc.getElementsByTagName('object')
@@ -105,6 +152,12 @@ for current_dir, dirs, files in os.walk('.'):
                     xml_cordinates = (float(xmin), float(xmax), float(ymin), float(ymax))
                     yolo_cordinates = getYoloCordinates((width,height), xml_cordinates)
 
+                    ocx = (float(xmin) + float(xmax))/2
+                    ocy = (float(ymin) + float(ymax))/2
+                    cv2.line(org_img, (int(ocx), int(ocy)), (int(ocx), int(ocy)), (255,100,255), 25)
+
+                    rot_img = rotate_chg(org_img, ANGLE)
+
                     print(org_img.shape)
                     print(rot_img.shape)
 
@@ -112,14 +165,17 @@ for current_dir, dirs, files in os.walk('.'):
 
                     # print(yolo_cordinates)
                     cx, cy = yolo_cordinates[0], yolo_cordinates[1]
+                    rotate_test(cx, cy, width, height, n_width, n_height)
+                    # print('1.', cy, cx)
                     cx, cy = rotate_matrix(cx, cy, width, height, n_width, n_height)
-                    print(cx, cy)
+                    # print('4.', cy, cx)
                     cx1, cy1 = cx*n_width, cy*n_height
+                    # cx1, cy1 = cx, cy
                     # print(cx1, cy1)
                     
-                    minmax = list()
+                    # minmax = list()
 
-                    minmax.append(find_minmax(float(xmin), float(xmax), float(ymin), float(ymax), width, height))
+                    # minmax.append(find_minmax(float(xmin), float(xmax), float(ymin), float(ymax), width, height))
 
                     # cv2.rectangle(rot_img, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255,0,255), 2)
                     cv2.line(rot_img, (int(cx1), int(cy1)), (int(cx1), int(cy1)), (0,0,255), 25)

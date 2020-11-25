@@ -20,21 +20,6 @@ class img_ramake:
     def rotate_matrix(self, x, y, w, h, nw, nh, angle):
         cos, sin = np.cos(np.pi * (angle/180)), np.sin(np.pi * (angle/180))
 
-        ww = (nw - w) / 2
-        hh = (nh - h) / 2
-        # print(hh, ww)
-
-        nx = ((x * w) + ww) / nw
-        ny = ((y * h) + hh) / nh
-        # print(ny, nx)
-        
-        xx = ((nx - 0.5) * cos) - ((0.5 - ny) * sin)
-        yy = ((nx - 0.5) * sin) + ((0.5 - ny) * cos)
-
-        # xx = ((x - 0.5) * cos) - ((0.5 - y) * sin)
-        # yy = ((x - 0.5) * sin) + ((0.5 - y) * cos)
-        return xx + 0.5, 0.5 - yy
-
     def img_ramake(self, degree):
         filename = os.listdir(ORIGIN_FORMAT_PATH)
         for file in filename:
@@ -43,10 +28,14 @@ class img_ramake:
 
         for file in filename:
             org_img_path = ORIGIN_FORMAT_PATH + "/" + file.split('.')[0] + '.jpg'
+
+            with open(ORIGIN_FORMAT_PATH + '/' + file.split('.')[0] + '.txt', 'r') as txt:
+                yolo_txt = txt.read()
+            
+            yolo_list = yolo_txt.split('\n')[:-1]
+            print(yolo_list)
+
             org_img = cv2.imread(org_img_path)
-            # cv2.imshow('image', org_img)
-            # cv2.waitKey()
-            # cv2.destroyAllWindows()
 
             while True:
                 if self.angle >= 360:
@@ -54,7 +43,6 @@ class img_ramake:
                     break   
                 
                 res_img = self.rotate_chg(org_img, self.angle)
-                
                 res_img_path = RESULT_FORMAT_PATH + "/" + file.split('.')[0] + str(self.angle) + '.jpg'  
                 self.angle = self.angle + degree
 
