@@ -17,8 +17,11 @@ class img_ramake:
         dst = ndimage.rotate(img, angle)
         return dst
 
-    def rotate_matrix(self, x, y, w, h, nw, nh, angle):
+    def rotate_matrix(self, list, angle):
+        x, y, w, h = list
         cos, sin = np.cos(np.pi * (angle/180)), np.sin(np.pi * (angle/180))
+
+        # print(x, y, w, h)
 
     def img_ramake(self, degree):
         filename = os.listdir(ORIGIN_FORMAT_PATH)
@@ -43,7 +46,11 @@ class img_ramake:
                     break   
                 
                 res_img = self.rotate_chg(org_img, self.angle)
-                res_img_path = RESULT_FORMAT_PATH + "/" + file.split('.')[0] + str(self.angle) + '.jpg'  
+                res_img_path = RESULT_FORMAT_PATH + "/" + file.split('.')[0] + str(self.angle) + '.jpg' 
+
+                self.rotate_matrix((1, 2, 3, 4), self.angle)
+
+
                 self.angle = self.angle + degree
 
                 
