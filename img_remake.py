@@ -5,8 +5,9 @@ from scipy import ndimage
 
 class img_remake:
     
-    def __init__(self):
+    def __init__(self, resize):
         self.angle = 0
+        self.resize = resize
         self.width = 0
         self.height = 0
         self.resized_width = 0
@@ -14,6 +15,14 @@ class img_remake:
         self.current_path = os.path.abspath(os.curdir)
         self.ORIGIN_FORMAT_PATH = self.current_path + '/images/org_image'
         self.RESULT_FORMAT_PATH = self.current_path + '/images/res_image'
+
+    def resize_img(self, img):
+        ratio = self.resize / img.shape[1]
+
+        resized_img = cv2.resize(img, None, fx=ratio, fy=ratio, interpolation=cv2.INTER_AREA)
+
+        return resized_img
+
 
     def rotate_img(self, img):
         dst = ndimage.rotate(img, self.angle)
@@ -134,6 +143,8 @@ class img_remake:
             yolo_list = yolo_txt.split('\n')[:-1]
 
             org_img = cv2.imread(org_img_path)
+            if self.resize != 0:
+                org_img = self.resize_img(org_img)
             self.height, self.width = org_img.shape[:2]
 
             points = self.search_point(yolo_list)

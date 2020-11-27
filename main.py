@@ -18,14 +18,14 @@ def directory_chk():
     if not os.path.isdir(XML_FORMAT_PATH):
         os.mkdir(XML_FORMAT_PATH)
 
-def main(xml, degree):
+def main(xml, degree, resize):
     directory_chk()
 
     if xml:
         converter = xml_converter()
         converter.xml_to_yolo()
 
-    img_rotate = img_remake()
+    img_rotate = img_remake(resize)
     img_rotate.img_remake(degree)
 
 if __name__ == "__main__":
@@ -33,9 +33,11 @@ if __name__ == "__main__":
 
     parser.add_argument('--xml', type=str, default=True, help="convert xml file to yolo coordinate")
     parser.add_argument('--degree', type=int, default=30, help="set degree")
+    parser.add_argument('--resize', type=int, default=0, help="set resize width")
 
     args = parser.parse_args()
     _xml = False if str(args.xml).lower() == 'false' else True
     _degree = int(args.degree) 
+    _resize = int(args.resize)
 
-    main(_xml, _degree)
+    main(_xml, _degree, _resize)
