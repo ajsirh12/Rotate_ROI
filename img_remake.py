@@ -53,6 +53,8 @@ class img_remake:
     def rotate_matrix(self, points):
         cos, sin = np.cos(np.pi * (self.angle/180)), np.sin(np.pi * (self.angle/180))
 
+        result = list()
+
         for point in points:
             point_x = list()
             point_y = list()
@@ -72,9 +74,12 @@ class img_remake:
             cx = (np.rint((xmin + xmax)/2)) / self.resized_width
             cy = (np.rint((ymin + ymax)/2)) / self.resized_height
             w = (np.rint(xmax - xmin)) / self.resized_width
-            h = (np.rint(ymax - ymin)) / self.resized_height
+            h = (np.rint(ymax - ymin)) / self.resized_height  
 
-            print(classes, cx, cy, w, h)
+            # print(cx, cy, w, h)
+            result.append((classes, cx, cy, w, h))
+        
+        return result
 
     
     def search_point(self, coords):
@@ -95,8 +100,9 @@ class img_remake:
             p3 = (xmax, ymin)
 
             result_point.append((classes, p0, p1, p2, p3))
-        # print(result_point)
+
         return result_point
+
 
     def img_remake(self, degree):
         filename = os.listdir(ORIGIN_FORMAT_PATH)
@@ -111,13 +117,11 @@ class img_remake:
                 yolo_txt = txt.read()
             
             yolo_list = yolo_txt.split('\n')[:-1]
-            # print(yolo_list)        
 
             org_img = cv2.imread(org_img_path)
             self.height, self.width = org_img.shape[:2]
 
             points = self.search_point(yolo_list)
-            # print(points)
 
             while True:
                 if self.angle >= 360:
@@ -128,12 +132,15 @@ class img_remake:
                 res_img_path = RESULT_FORMAT_PATH + "/" + file.split('.')[0] + str(self.angle) + '.jpg' 
                 self.resized_height, self.resized_width = res_img.shape[:2]
 
-                self.rotate_matrix(points)
+                cv2.imwrite(res_img_path, res_img)
+                result = self.rotate_matrix(points)
+                
+                with open(res_img_path.split('.')[0] + '.txt', 'w') as f:
+                    for i in result:
+                        f.write(i[0] + " " + " ".join([("%.6f" % a) for a in i[1:5]]) + '\n')
 
                 self.angle = self.angle + degree
 
-                
-        # print(filename)
 
 if __name__ == "__main__":
     remake = img_remake()
