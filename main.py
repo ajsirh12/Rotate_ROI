@@ -6,7 +6,21 @@ import os
 current_path = os.path.abspath(os.curdir)
 print("Current path is {}".format(current_path))
 
+ORIGIN_FORMAT_PATH = current_path + '/images/org_image'
+RESULT_FORMAT_PATH = current_path + '/images/res_image'
+XML_FORMAT_PATH = current_path + '/images/annotation'
+
+def directory_chk():
+    if not os.path.isdir(ORIGIN_FORMAT_PATH):
+        os.mkdir(ORIGIN_FORMAT_PATH)
+    if not os.path.isdir(RESULT_FORMAT_PATH):
+        os.mkdir(RESULT_FORMAT_PATH)
+    if not os.path.isdir(XML_FORMAT_PATH):
+        os.mkdir(XML_FORMAT_PATH)
+
 def main(xml, degree):
+    directory_chk()
+
     if xml:
         converter = xml_converter()
         converter.xml_to_yolo()
