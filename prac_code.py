@@ -71,7 +71,7 @@ def rotate_test(x, y, w, h, nw, nh):
 
     return xx, yy
 
-ANGLE = 90
+ANGLE = 330
 
 
 def rotate_matrix(x, y, w, h):
