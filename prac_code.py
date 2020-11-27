@@ -10,7 +10,6 @@ ORIGIN_FORMAT_PATH = current_path + '/images/org_image'
 RESULT_FORMAT_PATH = current_path + '/images/res_image'
 XML_FORMAT_PATH = current_path + '/images/annotation'
 
-
 file_count = 0
 classes={}
 classes["horse"] = 0

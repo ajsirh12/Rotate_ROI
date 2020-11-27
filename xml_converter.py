@@ -1,12 +1,6 @@
 from xml.dom import minidom
 import os
 
-current_path = os.path.abspath(os.curdir)
-print("Current path is {}".format(current_path))
-ORIGIN_FORMAT_PATH = current_path + '/images/org_image'
-RESULT_FORMAT_PATH = current_path + '/images/res_image'
-XML_FORMAT_PATH = current_path + '/images/annotation'
-
 class xml_converter:
 
     def __init__(self):
@@ -16,6 +10,11 @@ class xml_converter:
         self.classes["dog"] = 2
         self.classes["bird"] = 3    
         self.file_count = 0
+
+        self.current_path = os.path.abspath(os.curdir)
+        self.ORIGIN_FORMAT_PATH = self.current_path + '/images/org_image'        
+        self.XML_FORMAT_PATH = self.current_path + '/images/annotation'
+        os.chdir(self.XML_FORMAT_PATH)
 
     def getYoloCordinates(self, size, box):
         width_ratio = 1.0/size[0]
@@ -30,10 +29,8 @@ class xml_converter:
         h = h * height_ratio
         return (x,y,w,h)
 
-    os.chdir(XML_FORMAT_PATH)
-
     def xml_to_yolo(self):
-        with open(current_path + '/' + 'classes.txt', 'w') as txt:
+        with open(self.current_path + '/' + 'classes.txt', 'w') as txt:
             for item in self.classes:
                 txt.write(item + '\n')
                 print ("[%s] is added in classes.txt" % item)
@@ -42,7 +39,7 @@ class xml_converter:
             for file in files:
                 if file.endswith('.xml'):
                     xmldoc = minidom.parse(file)
-                    yolo_format = (ORIGIN_FORMAT_PATH+'/'+file[:-4]+'.txt')
+                    yolo_format = (self.ORIGIN_FORMAT_PATH+'/'+file[:-4]+'.txt')
 
                     with open(yolo_format, "w") as f:
             
@@ -71,3 +68,4 @@ class xml_converter:
                             self.file_count += 1
             
                     print ("{}. [{}] is created".format(self.file_count, yolo_format))
+        os.chdir(self.current_path)

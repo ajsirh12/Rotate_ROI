@@ -3,11 +3,6 @@ import cv2
 import numpy as np
 from scipy import ndimage
 
-current_path = os.path.abspath(os.curdir)
-ORIGIN_FORMAT_PATH = current_path + '/images/org_image'
-RESULT_FORMAT_PATH = current_path + '/images/res_image'
-XML_FORMAT_PATH = current_path + '/images/annotation'
-
 class img_remake:
     
     def __init__(self):
@@ -16,6 +11,9 @@ class img_remake:
         self.height = 0
         self.resized_width = 0
         self.resized_height = 0
+        self.current_path = os.path.abspath(os.curdir)
+        self.ORIGIN_FORMAT_PATH = self.current_path + '/images/org_image'
+        self.RESULT_FORMAT_PATH = self.current_path + '/images/res_image'
 
     def rotate_img(self, img):
         dst = ndimage.rotate(img, self.angle)
@@ -76,7 +74,6 @@ class img_remake:
             w = (np.rint(xmax - xmin)) / self.resized_width
             h = (np.rint(ymax - ymin)) / self.resized_height  
 
-            # print(cx, cy, w, h)
             result.append((classes, cx, cy, w, h))
         
         return result
@@ -104,16 +101,34 @@ class img_remake:
         return result_point
 
 
+    # Draw boundingbox
+    def test_img(self, img, result):
+
+        for res in result:
+            classes, cx, cy, w, h = res
+
+            ccx, ccy, ww, hh = float(cx) * self.resized_width, float(cy) * self.resized_height, float(w) * self.resized_width, float(h) * self.resized_height
+
+            xmin = np.rint(ccx - (ww/2))
+            xmax = np.rint(ccx + (ww/2))
+            ymin = np.rint(ccy - (hh/2))
+            ymax = np.rint(ccy + (hh/2))
+
+            res_img = cv2.rectangle(img, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (0,0,255), 2)
+        
+        return res_img
+
+
     def img_remake(self, degree):
-        filename = os.listdir(ORIGIN_FORMAT_PATH)
+        filename = os.listdir(self.ORIGIN_FORMAT_PATH)
         for file in filename:
             if not file.endswith('.txt'):
                 filename.remove(file)
 
         for file in filename:
-            org_img_path = ORIGIN_FORMAT_PATH + "/" + file.split('.')[0] + '.jpg'
+            org_img_path = self.ORIGIN_FORMAT_PATH + "/" + file.split('.')[0] + '.jpg'
 
-            with open(ORIGIN_FORMAT_PATH + '/' + file.split('.')[0] + '.txt', 'r') as txt:
+            with open(self.ORIGIN_FORMAT_PATH + '/' + file.split('.')[0] + '.txt', 'r') as txt:
                 yolo_txt = txt.read()
             
             yolo_list = yolo_txt.split('\n')[:-1]
@@ -129,11 +144,15 @@ class img_remake:
                     break   
                 
                 res_img = self.rotate_img(org_img)
-                res_img_path = RESULT_FORMAT_PATH + "/" + file.split('.')[0] + str(self.angle) + '.jpg' 
+                res_img_path = self.RESULT_FORMAT_PATH + "/" + file.split('.')[0] + str(self.angle) + '.jpg' 
                 self.resized_height, self.resized_width = res_img.shape[:2]
+                
+                result = self.rotate_matrix(points)
+
+                # Draw boundingbox
+                # res_img = self.test_img(res_img, result)
 
                 cv2.imwrite(res_img_path, res_img)
-                result = self.rotate_matrix(points)
                 
                 with open(res_img_path.split('.')[0] + '.txt', 'w') as f:
                     for i in result:
@@ -142,6 +161,6 @@ class img_remake:
                 self.angle = self.angle + degree
 
 
-if __name__ == "__main__":
-    remake = img_remake()
-    remake.img_remake(30)
+# if __name__ == "__main__":
+#     remake = img_remake()
+#     remake.img_remake(30)
