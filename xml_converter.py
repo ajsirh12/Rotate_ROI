@@ -5,10 +5,7 @@ class xml_converter:
 
     def __init__(self):
         self.classes={}
-        self.classes["horse"] = 0
-        self.classes["person"] = 1
-        self.classes["dog"] = 2
-        self.classes["bird"] = 3    
+        self.class_count = -1
         self.file_count = 0
 
         self.current_path = os.path.abspath(os.curdir)
@@ -29,12 +26,7 @@ class xml_converter:
         h = h * height_ratio
         return (x,y,w,h)
 
-    def xml_to_yolo(self):
-        with open(self.current_path + '/' + 'classes.txt', 'w') as txt:
-            for item in self.classes:
-                txt.write(item + '\n')
-                print ("[%s] is added in classes.txt" % item)
-            
+    def xml_to_yolo(self):            
         for current_dir, dirs, files in os.walk('.'):
             for file in files:
                 if file.endswith('.xml'):
@@ -50,6 +42,12 @@ class xml_converter:
             
                         for item in objects:
                             name =  (item.getElementsByTagName('name')[0]).firstChild.data
+
+                            if not name in self.classes:
+                                self.class_count += 1
+
+                            self.classes[name] = self.class_count
+
                             if name in self.classes:
                                 class_name = str(self.classes[name])
                             else:
@@ -68,4 +66,9 @@ class xml_converter:
                             self.file_count += 1
             
                     print ("{}. [{}] is created".format(self.file_count, yolo_format))
+
+        with open(self.current_path + '/' + 'classes.txt', 'w') as txt:
+            for item in self.classes:
+                txt.write(item + '\n')
+                print ("[%s] is added in classes.txt" % item)
         os.chdir(self.current_path)
