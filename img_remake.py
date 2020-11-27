@@ -144,7 +144,7 @@ class img_remake:
                     break   
                 
                 res_img = self.rotate_img(org_img)
-                res_img_path = self.RESULT_FORMAT_PATH + "/" + file.split('.')[0] + str(self.angle) + '.jpg' 
+                res_img_path = self.RESULT_FORMAT_PATH + "/" + file.split('.')[0] + '_' + str(self.angle) + '.jpg' 
                 self.resized_height, self.resized_width = res_img.shape[:2]
                 
                 result = self.rotate_matrix(points)
