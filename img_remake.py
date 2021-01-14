@@ -127,8 +127,19 @@ class img_remake:
         
         return res_img
 
+    def contrast_img(self, img):
+        alpha = 10 / 10.0
+        dst = np.clip((1 + alpha) * img - 128 - alpha, 0, 255).astype(np.uint8)
 
-    def img_remake(self, degree):
+        return dst
+
+    def blur_img(self, img):
+        kernel = np.ones((5,5),np.float32)/25
+        dst = cv2.filter2D(img,-1,kernel)
+
+        return dst
+
+    def img_remake(self, degree, contrast, blur):
         filename = os.listdir(self.ORIGIN_FORMAT_PATH)
         for file in filename:
             if not file.endswith('.txt'):
@@ -168,6 +179,46 @@ class img_remake:
                 with open(res_img_path.split('.')[0] + '.txt', 'w') as f:
                     for i in result:
                         f.write(i[0] + " " + " ".join([("%.6f" % a) for a in i[1:5]]) + '\n')
+
+                if contrast:
+                    con_img = self.contrast_img(res_img)
+                    con_img_path = self.RESULT_FORMAT_PATH + "/" + file.split('.')[0] + '_' + str(self.angle) + '_contrast.jpg' 
+
+                    cv2.imwrite(con_img_path, con_img)
+
+                    with open(con_img_path.split('.')[0] + '.txt', 'w') as f:
+                        for i in result:
+                            f.write(i[0] + " " + " ".join([("%.6f" % a) for a in i[1:5]]) + '\n')
+
+                if blur:
+                    blur_img = self.blur_img(res_img)
+                    blur_img_path = self.RESULT_FORMAT_PATH + "/" + file.split('.')[0] + '_' + str(self.angle) + '_blur.jpg' 
+
+                    cv2.imwrite(blur_img_path, blur_img)
+
+                    with open(blur_img_path.split('.')[0] + '.txt', 'w') as f:
+                        for i in result:
+                            f.write(i[0] + " " + " ".join([("%.6f" % a) for a in i[1:5]]) + '\n')
+
+                if blur and contrast:
+                    cont_blur_img = self.blur_img(con_img)
+                    cont_blur_img_path = self.RESULT_FORMAT_PATH + "/" + file.split('.')[0] + '_' + str(self.angle) + '_cont_blur.jpg' 
+                    
+                    cv2.imwrite(cont_blur_img_path, cont_blur_img)
+
+                    with open(cont_blur_img_path.split('.')[0] + '.txt', 'w') as f:
+                        for i in result:
+                            f.write(i[0] + " " + " ".join([("%.6f" % a) for a in i[1:5]]) + '\n')
+
+                    blur_cont_img = self.contrast_img(blur_img)
+                    blur_cont_img_path = self.RESULT_FORMAT_PATH + "/" + file.split('.')[0] + '_' + str(self.angle) + '_blur_cont.jpg' 
+                    
+                    cv2.imwrite(blur_cont_img_path, blur_cont_img)
+
+                    with open(blur_cont_img_path.split('.')[0] + '.txt', 'w') as f:
+                        for i in result:
+                            f.write(i[0] + " " + " ".join([("%.6f" % a) for a in i[1:5]]) + '\n')
+
 
                 self.angle = self.angle + degree
 
