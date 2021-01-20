@@ -141,11 +141,14 @@ class img_remake:
 
     def img_remake(self, degree, contrast, blur):
         filename = os.listdir(self.ORIGIN_FORMAT_PATH)
+        filename.sort()
+        
         for file in filename:
             if not file.endswith('.txt'):
                 filename.remove(file)
 
-        for file in filename:
+        for n, file in enumerate(filename):
+            print(n, file)
             org_img_path = self.ORIGIN_FORMAT_PATH + "/" + file.split('.')[0] + '.jpg'
 
             with open(self.ORIGIN_FORMAT_PATH + '/' + file.split('.')[0] + '.txt', 'r') as txt:

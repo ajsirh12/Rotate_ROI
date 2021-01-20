@@ -41,7 +41,7 @@ if __name__ == "__main__":
     _xml = False if str(args.xml).lower() == 'false' else True
     _degree = int(args.degree) 
     _resize = int(args.resize)
-    _contrast = False if str(args.xml).lower() == 'false' else True
-    _blur = False if str(args.xml).lower() == 'false' else True
+    _contrast = False if str(args.contrast).lower() == 'false' else True
+    _blur = False if str(args.blur).lower() == 'false' else True
 
     main(_xml, _degree, _resize, _contrast, _blur)
